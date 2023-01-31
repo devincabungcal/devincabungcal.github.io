@@ -26,7 +26,7 @@
 
 <link href="/docs/5.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
 
-    <!-- Favicons -->
+   
 <link rel="apple-touch-icon" href="/docs/5.3/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
 <link rel="icon" href="/docs/5.3/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="/docs/5.3/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
@@ -90,7 +90,7 @@
     </style>
 
     
-    <!-- Custom styles for this template -->
+    
     <link href="cover.css" rel="stylesheet">
   </head>
   <body class="d-flex h-100 text-center text-bg-dark">
@@ -101,7 +101,7 @@
 
         <nav class="navbar navbar-dark bg-dark fixed-top">
             <div class="container-fluid">
-              <h1>Devin Cabungcal</h1>
+              <h1>Real-Time Bus Tracker Project</h1>
               <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
                 <span class="navbar-toggler-icon"></span>
               </button>
@@ -113,22 +113,22 @@
                 <div class="offcanvas-body">
                   <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                     <li class="nav-item">
-                      <a class="nav-link active" aria-current="page" href="#">Home</a>
+                      <a class="nav-link active" aria-current="page" href="../Devin Portfolio/index.html">Home</a>
                     </li>
                     <li class="nav-item dropdown">
                       <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Projects
                       </a>
                       <ul class="dropdown-menu dropdown-menu-dark">
-                        <li><a class="dropdown-item" href="./pacmanproject.html">Pac-Man</a></li>
+                        <li><a class="dropdown-item" href="../pacman/index.html">Pac-Man</a></li>
                         <li>
                             <hr class="dropdown-divider">
                           </li>
-                        <li><a class="dropdown-item" href="./eyes.index.html">Eyes</a></li>
+                        <li><a class="dropdown-item" href="../eyes/index.html">Eyes</a></li>
                         <li>
                           <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="./bus-tracker.html">Real-Time Bus Tracker</a></li>
+                        <li><a class="dropdown-item" href="./index.html">Real-Time Bus Tracker</a></li>
                       </ul>
                     </li>
                   </ul>
@@ -143,15 +143,89 @@
   </header>
 
   <main class="px-3">
-    <img src="Devin3.JPG"/>
-    <p class="lead">Hi, my name is Devin Cabungcal. I was born and raised in Columbus, Ohio and now live in Cincinnati with my wife.</p>
-      <p class="lead">Growing up, I was always interested in games and activities that required building and problem solving.</p>
-      <p class="lead">This lead me to hobby of working on cars which have I made a career of for the past 7 years. While I have enjoyed</p>
-      <p class="lead">this phase of my life, I am excited to move on to my next problem solving adventure as a developer.</p>
-      <p>GitHub: devincabungcal</p>
-      <p><a href="https://www.linkedin.com/in/devin-cabungcal-5b295074">LinkedIn</a></p>
-      <p>Cell Phone: (614)285-8483</p>
-      <p>Email: devin.cabungcal@yahoo.com</p>
+    <script src="http://maps.google.com/maps/api/js?key=AIzaSyDf3Xfj1nbg__ZZSK-buBypjrf4yA2B4Yc"></script>
+    <div id="map" style="width:1024px; height:768px"></div>
+<script>
+
+var map;
+var markers = [];
+
+function init(){
+	var myOptions = {
+		zoom      : 14,
+		center    : { lat:42.353350,lng:-71.091525},
+		mapTypeId : google.maps.MapTypeId.ROADMAP
+	};
+	var element = document.getElementById('map');
+  	map = new google.maps.Map(element, myOptions);
+  	addMarkers();
+}
+
+async function addMarkers(){
+	var locations = await getBusLocations();
+
+	locations.forEach(function(bus){
+		var marker = getMarker(bus.id);		
+		if (marker){
+			moveMarker(marker,bus);
+		}
+		else{
+			addMarker(bus);			
+		}
+	});
+
+	console.log(new Date());
+	setTimeout(addMarkers,15000);
+}
+
+async function getBusLocations(){
+	var url = 'https://api-v3.mbta.com/vehicles?api_key=b9196876de4e4fdaa5b409b23e642141&filter[route]=1&include=trip';	
+	var response = await fetch(url);
+	var json     = await response.json();
+	return json.data;
+}
+
+function addMarker(bus){
+	var icon = getIcon(bus);
+	var marker = new google.maps.Marker({
+	    position: {
+	    	lat: bus.attributes.latitude, 
+	    	lng: bus.attributes.longitude
+	    },
+	    map: map,
+	    icon: icon,
+	    id: bus.id
+	});
+	markers.push(marker);
+}
+
+function getIcon(bus){
+	if (bus.attributes.direction_id === 0) {
+		return 'red.png';
+	}
+	return 'blue.png';	
+}
+
+function moveMarker(marker,bus) {
+	var icon = getIcon(bus);
+	marker.setIcon(icon);
+
+    marker.setPosition( {
+    	lat: bus.attributes.latitude, 
+    	lng: bus.attributes.longitude
+	});
+}
+
+function getMarker(id){
+	var marker = markers.find(function(item){
+		return item.id === id;
+	});
+	return marker;
+}
+
+window.onload = init;
+
+</script>
   </main>
 
   <footer class="mt-auto text-white-50">
@@ -159,10 +233,12 @@
   </footer>
 </div>
 
-
     
   </body>
 </html>
+
+
+
 
 
 
